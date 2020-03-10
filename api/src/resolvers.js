@@ -9,6 +9,7 @@ module.exports = {
       return ctx.models.Pet.findMany (input);
     },
     pet(_,input , ctx){
+      console.log('query=>pet')
       return ctx.models.Pet.findOne (input);
     }
   },
@@ -18,14 +19,16 @@ module.exports = {
       return pet
     }
    },
-  // Pet: {
-  //   img(pet) {
-  //     return pet.type === 'DOG'
-  //       ? 'https://placedog.net/300/300'
-  //       : 'http://placekitten.com/300/300'
-  //   }
-  // },
+  Pet: {
+    owner(_,__ , ctx){
+      console.log('pet=>owner')
+      return  ctx.models.User.findOne()
+    }
+  }
+  ,
   User: {
-    
+    pets(user,_,ctx){
+      return ctx.models.Pet.findMany()
+    }
   }
 }
