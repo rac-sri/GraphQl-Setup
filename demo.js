@@ -14,10 +14,23 @@ type User{
     avatar: String
     friends: [User]
 }
-type Shoe{
+interface Shoe{  #describes the common field to clean up queries
+    brand: ShoeType! #cant query a shoe
+    size:Int!#client can ask for these common fields , if without specification
+}
+
+type Sneaker implements Shoe {
     brand: ShoeType!
     size:Int!
+    sport: String!
 }
+
+type Boot implements Shoe {
+    brand: ShoeType!
+    size:Int!
+    hasGrip: Boolean!
+}
+
 input ShoesInput{
     brand: ShoeType,
     size:Int
@@ -38,8 +51,8 @@ input NewShoeInput{
 const resolvers={
     Query:{
         shoes(_,{input}){
-            return [{brand:'nike',size:12},
-                        {brand:'adidas', size:11}].filter(shoe=>shoe.brand===input.brand)
+            return [{brand:'nike',size:12 , sport:'basketball'},
+                        {brand:'adidas', size:11 , hasGrip:true}].filter(shoe=>shoe.brand===input.brand)
         },
         me(){
             return {
@@ -54,6 +67,12 @@ const resolvers={
             
         newShoe(_,{input}){
             return input
+        }
+    },
+    Shoe:{
+        __resolveType(shoe){
+            if(shoe.sport) return Sneaker
+            return 'Boot'
         }
     }
 }
