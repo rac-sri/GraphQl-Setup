@@ -1,37 +1,23 @@
-const gql = require('graphql-tag')
+const gql = require('graphql-tag');
 const {ApolloServer} = require('apollo-server')
-const typeDefs = gql`
-type User {
+const typeDefs=gql`
+type User{
     email: String!
     avatar: String
-    friends: [User] 
+    friends: [User]
 }
- type Query {
-     me: User!
-     shoes(input:ShoesInput): [Shoe]!
- }
+    type Query{
+        me: User!
+    }
 
- type Shoe {
-     brand: String!
-     size: Int!
- }
-
- input ShoesInput{
-     brand:String
-     size: Int
- }
 `
-const resolver = {
+const resolvers={
     Query:{
-        shoes(_, {input}){
-            return [{brand:'nike', size:12},
-                    {brand:'puma', size:10}]
-        },
         me(){
             return {
-                email: 'rac.sru3@gmail.com',
-                avatar: 'hsdlkfjsd',
-                friends: []
+                email: "jkdsfhjk@jksdf",
+                avatar: 'dishfsjkdf',
+                friends:[]
             }
         }
     }
@@ -40,7 +26,7 @@ const resolver = {
 
 const server = new ApolloServer({
     typeDefs,
-    resolver
+    resolvers
 })
 
-server.listen(4000).then(()=>console.log("Gql at port 4000"));
+server.listen(4000).then('Gql running');
