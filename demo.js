@@ -1,21 +1,29 @@
 const gql = require('graphql-tag');
 const {ApolloServer} = require('apollo-server')
 const typeDefs=gql`
+"""
+this is a documentation
+"""
+enum ShoeType{
+    JORDAN
+    RACHIT
+    KAKASHI
+}
 type User{
     email: String!
     avatar: String
     friends: [User]
 }
 type Shoe{
-    brand: String!
+    brand: ShoeType!
     size:Int!
 }
 input ShoesInput{
-    brand: String,
+    brand: ShoeType,
     size:Int
 }
 input NewShoeInput{
-    brand:String!
+    brand:ShoeType!
     size:Int!
 }
     type Query{
