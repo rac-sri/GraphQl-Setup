@@ -6,7 +6,8 @@ const {models, db} = require('./db')
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context(){
+  async context({req}){
+    const jwt = req.headers.authorization;
     return {models , db}
   }
 })
