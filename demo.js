@@ -14,9 +14,17 @@ input ShoesInput{
     brand: String,
     size:Int
 }
+input NewShoeInput{
+    brand:String!
+    size:Int!
+}
     type Query{
         me: User!
         shoes(input : ShoesInput):[Shoe]!
+    }
+
+    type Mutation{
+        newShoe(input: NewShoeInput!):Shoe!
     }
 `
 const resolvers={
@@ -31,6 +39,13 @@ const resolvers={
                 avatar: 'dishfsjkdf',
                 friends:[]
             }
+        }
+
+    },
+    Mutation:{
+            
+        newShoe(_,{input}){
+            return input
         }
     }
 }
