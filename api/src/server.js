@@ -11,6 +11,8 @@ const server = new ApolloServer({
   }
 })
 
+console.log("asdljksakld");
+
 server.listen().then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`);
 })

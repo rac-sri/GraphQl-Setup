@@ -6,13 +6,25 @@ type User{
     avatar: String
     friends: [User]
 }
+type Shoe{
+    brand: String!
+    size:Int!
+}
+input ShoesInput{
+    brand: String,
+    size:Int
+}
     type Query{
         me: User!
+        shoes(input : ShoesInput):[Shoe]!
     }
-
 `
 const resolvers={
     Query:{
+        shoes(_,{input}){
+            return [{brand:'nike',size:12},
+                        {brand:'adidas', size:11}].filter(shoe=>shoe.brand===input.brand)
+        },
         me(){
             return {
                 email: "jkdsfhjk@jksdf",
