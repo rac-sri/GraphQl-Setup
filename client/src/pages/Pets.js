@@ -42,11 +42,20 @@ export default function Pets () {
     console.log(input)
     setModal(false);
     createPet({
-      variables:{newPet:input}
+      variables:{newPet:input},
+      optimisticResponse:{
+        __typename:"Mutation",
+        addPet: {
+          __typename: 'Pet',
+          id: Math.floor(Math.random()*1000)+'',
+          name: input.name,
+          type: input.type
+        }
+      }
     }); 
   }
   
-  if(loading || newPet.loading)
+  if(loading)
   {
     return <Loader />    //since useQuery is async in background
   }
