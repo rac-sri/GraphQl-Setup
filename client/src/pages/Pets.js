@@ -1,73 +1,91 @@
 import React, {useState} from 'react'
 import gql from 'graphql-tag'
+import PetBox from '../components/PetBox'
+import NewPet from '../components/NewPet'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import PetsList from '../components/PetsList'
-import NewPetModal from '../components/NewPetModal'
 import Loader from '../components/Loader'
-import { unstable_batchedUpdates } from 'react-dom'
 
-const query = gql`
-  query AllPets{
-    pets{
-      id
-      name 
-      type
-    }
+const PET_DETAILS = gql`
+  fragment PetDetails on Pet {
+    id
+    type
+    name
+    img
+    vacinated @client
   }
 `
 
-const NEW_PET = gql`
-  mutation CreateAPet($newPet: newPetInput!){
-    addPet: newPet(input: $newPet){
-      id
-      name
-      type
+const GET_PETS = gql`
+  query petsList($input: PetsInput) {
+    pets(input: $input) {
+      ...PetDetails
     }
   }
+  ${PET_DETAILS}
 `
+
+const CREATE_PET = gql`
+  mutation CreatePet($input: NewPetInput!) {
+    addPet(input: $input) {
+      ...PetDetails
+    }
+  }
+  ${PET_DETAILS}
+`;
+
 export default function Pets () {
   const [modal, setModal] = useState(false)
-  const {data , loading , error} = useQuery(query)
-  const [createPet , newPet] = useMutation(NEW_PET,{
-  update(cache,{data:{addPet}}){
-    console.log("inside of update")
-    const allPets = cache.readQuery({query: query})
-    cache.writeQuery({
-      query: query,
-      data:{pets:[addPet,...allPets.pets]}
-    })
-  }
-});
+  const pets = useQuery(GET_PETS)
+
+  const [createPet, newPet] = useMutation(CREATE_PET, {
+    update(cache, { data: { addPet } }) {
+      const { pets } = cache.readQuery({ query: GET_PETS })
+
+      cache.writeQuery({
+        query: GET_PETS,
+        data: { pets: [addPet, ...pets] }
+      })
+    }
+  })
+
+  if (pets.loading) return <Loader />
+  if (pets.error || newPet.error) return <p>ERROR</p>
+
   const onSubmit = input => {
-    console.log(input)
-    setModal(false);
+    setModal(false)
     createPet({
-      variables:{newPet:input},
-      optimisticResponse:{
-        __typename:"Mutation",
+      variables: {input},
+    
+      optimisticResponse: {
+        __typename: 'Mutation',
         addPet: {
           __typename: 'Pet',
-          id: Math.floor(Math.random()*1000)+'',
+          id: Math.round(Math.random() * -1000000) + '',
+          type: input.type,
           name: input.name,
-          type: input.type
+          img: 'https://via.placeholder.com/300',
+          vacinated: true
         }
       }
-    }); 
-  }
-  
-  if(loading)
-  {
-    return <Loader />    //since useQuery is async in background
-  }
-if(error || newPet.error)
-  {
-    return <p>error</p>
+    })
   }
 
-  if(error)
-  console.log(data)
+  const petsList = pets.data.pets.map(pet => (
+    <div className="col-xs-12 col-md-4 col" key={pet.id}>
+      <div className="box">
+        <PetBox pet={pet} />
+      </div>
+    </div>
+  ))
+  
   if (modal) {
-    return <NewPetModal onSubmit={onSubmit} onCancel={() => setModal(false)} />
+    return (
+      <div className="row center-xs">
+        <div className="col-xs-8">
+          <NewPet onSubmit={onSubmit} onCancel={() => setModal(false)}/>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -84,7 +102,9 @@ if(error || newPet.error)
         </div>
       </section>
       <section>
-        <PetsList pets={data.pets}/>
+        <div className="row">
+          {petsList}
+        </div>
       </section>
     </div>
   )

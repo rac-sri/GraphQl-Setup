@@ -6,13 +6,11 @@ const {models, db} = require('./db')
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  async context({req}){
-    const jwt = req.headers.authorization;
-    return {models , db}
+  context() {
+    const user = db.get('user').value()
+    return {models, db, user}
   }
 })
-
-console.log("asdljksakld");
 
 server.listen().then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`);
