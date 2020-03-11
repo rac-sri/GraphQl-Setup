@@ -9,3 +9,6 @@
 * npm install
 * yarn server
 * yarn app
+
+## Fir integration with express
+> https://github.com/graphql/express-graphql/blob/master/README.md
