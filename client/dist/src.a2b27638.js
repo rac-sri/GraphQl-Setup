@@ -50439,6 +50439,8 @@ var _NewPetModal = _interopRequireDefault(require("../components/NewPetModal"));
 
 var _Loader = _interopRequireDefault(require("../components/Loader"));
 
+var _reactDom = require("react-dom");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
@@ -50454,6 +50456,15 @@ const query = (0, _graphqlTag.default)`
     }
   }
 `;
+const NEW_PET = (0, _graphqlTag.default)`
+  mutation CreateAPet($newPet: newPetInput!){
+    addPet: newPet(input: $newPet){
+      id
+      name
+      type
+    }
+  }
+`;
 
 function Pets() {
   const [modal, setModal] = (0, _react.useState)(false);
@@ -50462,16 +50473,41 @@ function Pets() {
     loading,
     error
   } = (0, _reactHooks.useQuery)(query);
+  const [createPet, newPet] = (0, _reactHooks.useMutation)(NEW_PET, {
+    update(cache, {
+      data: {
+        addPet
+      }
+    }) {
+      console.log("inside of update");
+      const allPets = cache.readQuery({
+        query: query
+      });
+      cache.writeQuery({
+        query: query,
+        data: {
+          pets: [addPet, ...allPets.pets]
+        }
+      });
+    }
+
+  });
 
   const onSubmit = input => {
+    console.log(input);
     setModal(false);
+    createPet({
+      variables: {
+        newPet: input
+      }
+    });
   };
 
-  if (loading) {
+  if (loading || newPet.loading) {
     return _react.default.createElement(_Loader.default, null); //since useQuery is async in background
   }
 
-  if (error) {
+  if (error || newPet.error) {
     return _react.default.createElement("p", null, "error");
   }
 
@@ -50498,7 +50534,7 @@ function Pets() {
     pets: data.pets
   })));
 }
-},{"react":"../node_modules/react/index.js","graphql-tag":"../node_modules/graphql-tag/src/index.js","@apollo/react-hooks":"../node_modules/@apollo/react-hooks/lib/react-hooks.esm.js","../components/PetsList":"src/components/PetsList.js","../components/NewPetModal":"src/components/NewPetModal.js","../components/Loader":"src/components/Loader.js"}],"src/components/App.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","graphql-tag":"../node_modules/graphql-tag/src/index.js","@apollo/react-hooks":"../node_modules/@apollo/react-hooks/lib/react-hooks.esm.js","../components/PetsList":"src/components/PetsList.js","../components/NewPetModal":"src/components/NewPetModal.js","../components/Loader":"src/components/Loader.js","react-dom":"../node_modules/react-dom/index.js"}],"src/components/App.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -53718,7 +53754,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38327" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "40311" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

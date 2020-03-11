@@ -15,7 +15,10 @@ module.exports = {
   },
   Mutation: {
     newPet(_,{input},ctx){
+      console.log(input)
       const pet = ctx.models.Pet.create(input)
+      console.log(pet)
+      console.log("akjdhsajkfa")
       return pet
     }
    },
