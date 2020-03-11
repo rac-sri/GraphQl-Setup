@@ -50445,12 +50445,37 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
+const query = (0, _graphqlTag.default)`
+  query AllPets{
+    pets{
+      id
+      name 
+      type
+    }
+  }
+`;
+
 function Pets() {
   const [modal, setModal] = (0, _react.useState)(false);
+  const {
+    data,
+    loading,
+    error
+  } = (0, _reactHooks.useQuery)(query);
 
   const onSubmit = input => {
     setModal(false);
   };
+
+  if (loading) {
+    return _react.default.createElement(_Loader.default, null); //since useQuery is async in background
+  }
+
+  if (error) {
+    return _react.default.createElement("p", null, "error");
+  }
+
+  if (error) console.log(data);
 
   if (modal) {
     return _react.default.createElement(_NewPetModal.default, {
@@ -50469,7 +50494,9 @@ function Pets() {
     className: "col-xs-2"
   }, _react.default.createElement("button", {
     onClick: () => setModal(true)
-  }, "new pet")))), _react.default.createElement("section", null, _react.default.createElement(_PetsList.default, null)));
+  }, "new pet")))), _react.default.createElement("section", null, _react.default.createElement(_PetsList.default, {
+    pets: data.pets
+  })));
 }
 },{"react":"../node_modules/react/index.js","graphql-tag":"../node_modules/graphql-tag/src/index.js","@apollo/react-hooks":"../node_modules/@apollo/react-hooks/lib/react-hooks.esm.js","../components/PetsList":"src/components/PetsList.js","../components/NewPetModal":"src/components/NewPetModal.js","../components/Loader":"src/components/Loader.js"}],"src/components/App.js":[function(require,module,exports) {
 "use strict";
@@ -53626,26 +53653,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Create a new apollo client and export as default
  */
 const link = new _apolloLinkHttp.HttpLink({
-  uri: 'https://rickandmortyapi.com/graphql'
+  uri: 'http://localhost:4000/'
 });
 const cache = new _apolloCacheInmemory.InMemoryCache();
 const client = new _apolloClient.ApolloClient({
   link,
   cache
 });
-const query = (0, _graphqlTag.default)`
-    {
-        characters {
-            results {
-                id
-                name
-            }
-        }
-    }
- `;
-client.query({
-  query
-}).then(result => console.log(result));
 var _default = client;
 exports.default = _default;
 },{"apollo-client":"../node_modules/apollo-client/bundle.esm.js","apollo-cache-inmemory":"../node_modules/apollo-cache-inmemory/lib/bundle.esm.js","apollo-link-http":"../node_modules/apollo-link-http/lib/bundle.esm.js","graphql-tag":"../node_modules/graphql-tag/src/index.js"}],"src/index.js":[function(require,module,exports) {
@@ -53667,7 +53681,9 @@ var _client = _interopRequireDefault(require("./client"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const Root = () => _react.default.createElement(_reactRouterDom.BrowserRouter, null, _react.default.createElement(_App.default, null));
+const Root = () => _react.default.createElement(_reactRouterDom.BrowserRouter, null, _react.default.createElement(_reactHooks.ApolloProvider, {
+  client: _client.default
+}, _react.default.createElement(_App.default, null)));
 
 _reactDom.default.render(_react.default.createElement(Root, null), document.getElementById('app'));
 
@@ -53702,7 +53718,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34203" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38327" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

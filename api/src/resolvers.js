@@ -6,7 +6,7 @@
 module.exports = {
   Query: {
     pets(_,{input} , ctx){
-      return ctx.models.Pet.findMany (input);
+      return ctx.models.Pet.findMany();
     },
     pet(_,input , ctx){
       console.log('query=>pet')
