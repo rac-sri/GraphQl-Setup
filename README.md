@@ -5,6 +5,7 @@
 * Node version >= 6
 
 ## Getting Started
-> npm install
-> yarn server
-> yarn app
+
+* npm install
+* yarn server
+* yarn app
